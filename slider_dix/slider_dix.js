@@ -1,561 +1,318 @@
-//******************************************************
+п»ї//******************************************************
 /*
  * Dmitry Boyko
- * 15.05.2018 v1.9
+ * v2,0
+ * 03.06.2023
  *
  * 04.12.2013
- * 24.12.2013
- * itdix.met
  * tmgsoft@hotmail.com
 */
 //******************************************************
 /*
-Параметры сладеров
-element - css елемент в сладере
-interval - длительность анимации
-auto - пауза между анимациями / 0 - откоючить автоматическую анимацию
-look - пауза при ручном выборе
-adaptive - если передать yes то адаптация работает (по высоте внутрених блоков)
-prev и next - кноки для переключения
-//******************************************************
-Параметры функции
-sElement - блоки которые будут вращаться
-sCount - количество элементов в слайдере
-sMargin - ширина элемента
-sInterval - (шаг) интервал анимаии слайдера
-sAuto_interval - пауза при автоматической анимации   (пропуск шагов)
-sLook - пауза после ручного выбора (пропуск шагов)
+РџР°СЂР°РјРµС‚СЂС‹ СЃР»Р°РґРµСЂРѕРІ
+element - css РµР»РµРјРµРЅС‚ РІ СЃР»Р°РґРµСЂРµ
+interval - РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ Р°РЅРёРјР°С†РёРё
+auto - РїР°СѓР·Р° РјРµР¶РґСѓ Р°РЅРёРјР°С†РёСЏРјРё / 0 - РѕС‚РєРѕСЋС‡РёС‚СЊ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєСѓСЋ Р°РЅРёРјР°С†РёСЋ
+look - РїР°СѓР·Р° РїСЂРё СЂСѓС‡РЅРѕРј РІС‹Р±РѕСЂРµ
+adaptive - РµСЃР»Рё РїРµСЂРµРґР°С‚СЊ yes С‚Рѕ Р°РґР°РїС‚Р°С†РёСЏ СЂР°Р±РѕС‚Р°РµС‚ (РїРѕ РІС‹СЃРѕС‚Рµ РІРЅСѓС‚СЂРµРЅРёС… Р±Р»РѕРєРѕРІ)
+prev Рё next - РєРЅРѕРєРё РґР»СЏ РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ
 */
 //******************************************************
 
-
-//******************************************************
-
-(function($){
-  jQuery.fn.SliderDIX = function (slider_get)
-//function SliderDIX(sName,sElement,sCount,sMargin,sInterval,sAuto_interval,sLook)
-	{
-	//******************************************************
-	//Параметры по умолчанию
-	var _slider_default=({
-	  'element':'img',
-	  'interval':1000,
-	  'auto':2000,
-	  'look':5000
-	}) ;
-	if(slider_get==undefined)slider_get=_slider_default;
-	//******************************************************
-	//                      НАСТРОЙКИ
-	var _Slider=jQuery(this);
-	var sElement=slider_get['element'] ;
-	var count=0;           					//картинок видимых в слайдере
-	var margin=0;        					//ширина блока
-	var interval=slider_get['interval'];     //анимация блоков
-	var auto_interval=slider_get['auto'];//пауза при авто прокрутке
-	var Look=slider_get['look'];//пауза при ручном выборе
-	var but_prev='#sdprev';
-	var but_next='#sdnext';
-	//******************************************************
-	//Добавить параметры по умолчанию
-	if(sElement==undefined)sElement=_slider_default['element'];
-	if(interval==undefined)interval=_slider_default['interval'];
-	if(auto_interval==undefined)auto_interval=_slider_default['auto'];
-	if(Look==undefined)Look=_slider_default['look'];
-	//******************************************************
-	//
-	margin=jQuery(jQuery(this).find(sElement)).width();
-	count=Math.ceil(_Slider.width()/margin);
-	//******************************************************
-	//
-	if(slider_get['prev']==undefined){
-		_Slider.append('<div id="sdprev"></div>');
-		but_prev=_Slider.find(but_prev);
-	}else{
-		but_prev=jQuery(slider_get['prev']);
-	}
-
-	if(slider_get['prev']==undefined){
-		_Slider.append('<div id="sdnext"></div>');
-		but_next=_Slider.find(but_next);
-	}else{
-		but_next=jQuery(slider_get['next']);
-	}
-	//******************************************************
-	var width_ls='';          //ширина слайдера
-	var step =margin;        //перемещение картинки
-	var loced=false;          //блокировать при анимации
-	var element_count=0;     //всех елементов в листалке
-	var element_left=0;
-	var animate_cont="next";//направление анимации
-	var user_control=false;//ручная прокрутка
-	var slider_loked=false;//блокировка анимации когда не активна страница
-	//var auto_slider=0;
-	var time=new Date().getTime(); //текущее время в UNIX
-	var time_pause=0; //остановить прокрутку слайдера в UNIX
-	//******************************************************
-	//Выполнить при запуске
-	//sName='#'+sName+' ';//ID  + отступ в CSS
-	  //позиция каждого блока при загрузке
-	  _Slider.find(sElement).each(function(i,element){
-		jQuery(element).css('left',i*margin) ;
-	  });
-	  element_count=jQuery(this).find(sElement).length;//количество елементов  в листалке
-	  //ширина листалки
-	  width_ls=count* margin;
-	  
-	  //_Slider.find(work).css('width',width_ls+'px') ; 
-	  jQuery(this).find(sElement).css('position','absolute');
-	//Адаптивная высота
-	if(slider_get['adaptive']=='yes'){//вдватация не выключена
-		var _height_el=_Slider.find(sElement).height();
-		_Slider.height(_height_el);
-		jQuery(window).resize(function(){
-		  _height_el=_Slider.find(sElement).height();
-		  _Slider.height(_height_el);
-		});
-	}
-	
-	//******************************************************
-	//Прокрутка элементов в слайдере
-	time_pause=time+auto_interval; //ожидание прокрутки
-	var auto_slider=setInterval(function()
-	{
-	  if(_Slider.css('display')=='none')
-	  {
-		slider_loked=true;
-		
-	  }
-	  else
-	  {
-		slider_loked=false;
-	  }
-
-	  if(auto_interval>0)time=new Date().getTime();//отщет времени  и блокировать автоматической прокрутки если 0
-
-	  if(loced==false)  //анимация завершена
-	  {
-		//анимация элементов после таймаута
-		//если пользователь не выбрал направление сам
-		//также весь слайдер блокируется если страница потерялп фокус
-		if(time>time_pause && slider_loked==false || user_control==true)
-		{
-		  controler(animate_cont);//анимация
-		  if(user_control==true)   //настроки после ручного выбора элемента
-		  {
-			time_pause=time+Look;  //задержка чтобы посмотреть на элементы
-			user_control=false;    //слейдер переключается после задержки в автоматический режим
-			animate_cont="next";   //вернутся к стандартному направлению элементов
-		  }
-		  else                     //настройки автоматического режима
-		  {
-			time_pause=time+auto_interval; //интервал для автоматической анимации
-		  }
-		}
-	  }
-	},300);//интервал для проверки
-	//******************************************************
-	  //если страница с слайдером не активна то слайдер остановлен
-	  jQuery(window).bind('blur', function() {
-		slider_loked=true;
-	  });
-	  jQuery(window).bind('focus', function() {
-		slider_loked=false;
-	  });
-
-
-
-	  //******************************************************
-	  // ручной переход между картинками
-	  jQuery(function(){
-		but_prev.click(function(){      //назад
-		  animate_cont='prev';
-		  user_control=true;
-		});
-
-		but_next.click(function(){      //вперед
-		  animate_cont='next';
-		  user_control=true;
-
-		});
-
-		_Slider.find(sElement).click(function(){        //остановить для посмотра
-		  time_pause=time+Look;
-		});
-	  });
-
-	  //******************************************************
-	  //Скролинг всех картинок по очереди
-	  function animate(direction)
-	  {
-
-		var left=0;
-		//поочередное пролистывание блоков
-		_Slider.find(sElement).each(function(i,element){
-			left=jQuery(element).position().left;
-			if(direction=='prev')//в лево
-			{
-			  left=left-step;
-			}
-			else                 //в право
-			{
-			  left=left+step;
-			}
-			// Анимация
-			jQuery(element).animate({
-			  left: left+'px',
-			},interval);
-		  });
-		  setTimeout(function(){loced=false},interval) ;  //следующий
-	  }
-
-
-	  //******************************************************
-	  //Подготовка блоков для анимации
-	  //порядок размещения картинок в слайдере перед анимацией
-	  function controler(direction)
-	  {
-		loced=true;
-		var left=0; //позиция елемента в слайдере
-		element_left=-1;
-		//Показывать только елементы участвующие в анимации
-		_Slider.find(sElement).each(function(i,element){
-		  left=jQuery(element).position().left;
-		  if(left<0 || left>width_ls-margin)_Slider.find(sElement+':eq('+i+')').css('display','none'); //все елементы вне слайдера скрыть
-		  if(left==0 && element_left==-1 && _Slider.find(sElement+':eq('+i+')').css('display')=='block') element_left=i;  //первый элемент в слайдере
-		});
-		//*****************************************
-		//Следующий выежающий елемент, сделать видимым
-		var element_next=0;
-		if(direction=='prev')//следующий элемент размещается с права
-		{
-		  element_next=element_left+count; //прокрутка элемента с права от видимых
-		  //если элементов нет с права
-		  //берем самый левый элемент в слайдере
-		  //Прощитываем так, берем от видимого левого элемента
-		  //отнимаем количество невидимых
-		  if(element_next>element_count-1) element_next= element_left-(element_count-count);
-		  _Slider.find(sElement+':eq('+element_next+')').css('display','block');
-		  _Slider.find(sElement+':eq('+element_next+')').css('left',width_ls) ;//разместить последним
-		}
-		else //следующий элемент размещается с лева
-		{
-		  element_next=element_left-1;  // прокрутка элемента с лева
-		  //если элементы с лева закончились
-		  if(element_next<0) element_next= element_count-1; // берем самый правый элемент (последний)
-		  _Slider.find(sElement+':eq('+element_next+')').css('display','block');
-		  _Slider.find(sElement+':eq('+element_next+')').css('left',-margin) ; //разместить перед всеми элементами
-		}
-		animate(direction); // Анимация
-
-
-	  }
-
-	}
-//***********************************************************************************************************
-jQuery.fn.SliderDO = function (slider_get){
-    //******************************************************
-	//Параметры по умолчанию
-	var _slider_default=({
-	  'element':'img',
-	  'interval':500,
-	  'auto':2000,
-	  'look':5000
-	}) ;
-	if(slider_get==undefined)slider_get=_slider_default;
-	//******************************************************
-    //******************************************************
-	//                      НАСТРОЙКИ
-	var _Slider=jQuery(this);
-    var sElement=slider_get['element'];
-    var _length=0;
-    var interval=slider_get['interval'];     //анимация блоков
-	var auto_interval=slider_get['auto'];//пауза при авто прокрутке
-    var but_prev='#sdprev';
-	var but_next='#sdnext';
-	var loced=false;          //блокировать при анимации
-    //******************************************************
-	//Добавить параметры по умолчанию
-	if(sElement==undefined)sElement=_slider_default['element'];
-	if(interval==undefined)interval=_slider_default['interval'];
-	if(auto_interval==undefined)auto_interval=_slider_default['auto'];
-	//if(Look==undefined)Look=_slider_default['look'];
-	
-	//******************************************************
-	//Адаптивная высота
-	if(slider_get['adaptive']=='yes'){//вдватация не выключена
-		var _height_el=_Slider.find(sElement).height();
-		_Slider.height(_height_el);
-		jQuery(window).resize(function(){
-		  _height_el=_Slider.find(sElement).height();
-		  _Slider.height(_height_el);
-		});
-	}
-    //******************************************************
-	//
-	if(slider_get['prev']==undefined){
-		_Slider.append('<div id="sdprev"></div>');
-		but_prev=_Slider.find(but_prev);
-	}else{
-		but_prev=jQuery(slider_get['prev']);
-	}
-
-	if(slider_get['prev']==undefined){
-		_Slider.append('<div id="sdnext"></div>');
-		but_next=_Slider.find(but_next);
-	}else{
-		but_next=jQuery(slider_get['next']);
-	}
-	//******************************************************
-    _Slider.find(sElement+':eq(0)').addClass('activ');
-    _Slider.find(sElement+':eq(0)').css('opacity',1);
-    _length=_Slider.find(sElement).length;
-    //******************************************************
-    //Кнопки выбора
-    but_prev.click(function(){
-	if(!loced){
-		loced=true;
-      var _activ=_Slider.find('.activ');
-      //Анимацыя исчезновения
-      _activ.animate({opacity:0},interval).queue(function(){
-        _activ.removeClass('activ') ;
-        if(_activ.prev(sElement).length>0){ //показать следующий
-            _activ.prev().addClass('activ') ;
-
-        }else{ //блоки закончились показать первый
-          _Slider.find(sElement).last().addClass('activ');
-        }
-        //Покаать новый блок
-        _Slider.find('.activ').animate({opacity: 1},interval);
-		loced=false;
-        //завершение анимации
-        jQuery(this).dequeue();
-      });
-	}
-
-    })
-    but_next.click(function(){
-	if(!loced){
-		loced=true;
-      var _activ=_Slider.find('.activ');
-      //Анимацыя исчезновения
-      _activ.animate({opacity:0},interval).queue(function(){
-        _activ.removeClass('activ') ;
-        if(_activ.next(sElement).length>0){ //показать следующий
-            _activ.next().addClass('activ') ;
-
-        }else{ //блоки закончились показать первый
-          _Slider.find(sElement).first().addClass('activ');
-        }
-        //Покаать новый блок
-        _Slider.find('.activ').animate({opacity: 1},interval);
-		loced=false;
-        //завершение анимации
-        jQuery(this).dequeue();
-      });
-	}
-    })
-	
-	
-	if(auto_interval>0 && _Slider.find(sElement).length>2){
-	  
-		var timerId = setInterval(function(){
-		if(!loced){
-		loced=true;
-		var _activ=_Slider.find('.activ');
-      //Анимацыя исчезновения
-      _activ.animate({opacity:0},interval).queue(function(){
-        _activ.removeClass('activ') ;
-        if(_activ.next(sElement).length>0){ //показать следующий
-            _activ.next().addClass('activ') ;
-
-        }else{ //блоки закончились показать первый
-          _Slider.find(sElement).first().addClass('activ');
-        }
-        //Покаать новый блок
-        _Slider.find('.activ').animate({opacity: 1},interval);
-		loced=false;
-        //завершение анимации
-        jQuery(this).dequeue();
-      });
-	  
-		}
-		},auto_interval);
-
-	}
-
-}
-//***********************************************************************************************************
-jQuery.fn.SliderDExtinction = function (slider_get){
-    //******************************************************
-	//Параметры по умолчанию
-	var _slider_default=({
-	  'element':'img',
-	  'interval':500,
-	  'auto':2000,
-	  'look':5000
-	}) ;
-	if(slider_get==undefined)slider_get=_slider_default;
-	//******************************************************
-    //******************************************************
-	//                      НАСТРОЙКИ
-	var _Slider=jQuery(this);
-    var sElement=slider_get['element'];
-    var _length=0;
-    var interval=slider_get['interval'];     //анимация блоков
-	var auto_interval=slider_get['auto'];//пауза при авто прокрутке
-    var but_prev='#sdprev';
-	var but_next='#sdnext';
-	var loced=false;          //блокировать при анимации
-    //******************************************************
-	//Добавить параметры по умолчанию
-	if(sElement==undefined)sElement=_slider_default['element'];
-	if(interval==undefined)interval=_slider_default['interval'];
-	if(auto_interval==undefined)auto_interval=_slider_default['auto'];
-	//if(Look==undefined)Look=_slider_default['look'];
-	//******************************************************
-	//Адаптивная высота
-	if(slider_get['adaptive']=='yes'){//вдватация не выключена
-		var _height_el=_Slider.find(sElement).height();
-		_Slider.height(_height_el);
-		jQuery(window).resize(function(){
-		  _height_el=_Slider.find(sElement).height();
-		  _Slider.height(_height_el);
-		});
-	}
-    //******************************************************
-	//
-	if(slider_get['prev']==undefined){
-		_Slider.append('<div id="sdprev"></div>');
-		but_prev=_Slider.find(but_prev);
-	}else{
-		but_prev=jQuery(slider_get['prev']);
-	}
-
-	if(slider_get['prev']==undefined){
-		_Slider.append('<div id="sdnext"></div>');
-		but_next=_Slider.find(but_next);
-	}else{
-		but_next=jQuery(slider_get['next']);
-	}
-	//******************************************************
-    _Slider.find(sElement+':eq(0)').addClass('activ');
-    _Slider.find(sElement+':eq(0)').css('opacity',1);
-	
-    _length=_Slider.find(sElement).length;
-    //******************************************************
-    //Кнопки выбора
-    but_prev.click(function(){
-
-      var _activ=_Slider.find('.activ');
-	  //alert(_activ.next(sElement).index());
-		if(_activ.prev(sElement).length>0){ //показать следующий
-            _activ.prev().addClass('next') ;
-
-        }else{ //блоки закончились показать первый
-          _Slider.find(sElement).last().addClass('next');
-        }
-		var _next=_Slider.find('.next');
-		
-		_next.removeClass('next') ;
-		_next.css({
-			'opacity':1,
-			'display': 'block',
-			'z-index': 50,
-		});
-		
-        	
-      //Анимацыя исчезновения
-      _activ.animate({opacity:0},interval).queue(function(){
-        
-        _activ.removeClass('activ') ;
-		_next.addClass('activ') ;
-		_next.css({
-			'display': 'block',
-			'z-index': 100,
-		});
-		
-    
-        jQuery(this).dequeue();
-      });
-
-    })
-    but_next.click(function(){
-      var _activ=_Slider.find('.activ');
-		if(_activ.next(sElement).length>0){ //показать следующий
-            _activ.next().addClass('next') ;
-
-        }else{ //блоки закончились показать первый
-          _Slider.find(sElement).first().addClass('next');
-        }
-		var _next=_Slider.find('.next');
-		
-		_next.removeClass('next') ;
-		_next.css({
-			'opacity':1,
-			'display': 'block',
-			'z-index': 50,
-		});
-		
-        	
-      //Анимацыя исчезновения
-      _activ.animate({opacity:0},interval).queue(function(){
-        
-        _activ.removeClass('activ') ;
-		_next.addClass('activ') ;
-		_next.css({
-			'display': 'block',
-			'z-index': 100,
-		});
-		
-    
-        jQuery(this).dequeue();
-      });
-	  
-
-    })
-	
-
-	if(auto_interval>0 && _Slider.find(sElement).length>2){
-	  
-		var timerId = setInterval(function(){
-		
-		var _activ=_Slider.find('.activ');
-		if(_activ.next(sElement).length>0){ //показать следующий
-            _activ.next(sElement).addClass('next') ;
-
-        }else{ //блоки закончились показать первый
-          _Slider.find(sElement).first().addClass('next');
-        }
-		var _next=_Slider.find('.next');
-		
-		_next.removeClass('next') ;
-		_next.css({
-			'opacity':1,
-			'display': 'block',
-			'z-index': 50,
-		});
-		
-        	
-      //Анимацыя исчезновения
-      _activ.animate({opacity:0},interval).queue(function(){
-        
-        _activ.removeClass('activ') ;
-		_next.addClass('activ') ;
-		_next.css({
-			'display': 'block',
-			'z-index': 100,
-		});
-		
-    
-        jQuery(this).dequeue();
-      });
-	  
-
-		},auto_interval);
-
-	}
-
+function SliderDIX(_selector='',_setting={}){
+	if(_selector=='')return false;
+	return new slider_dix(_selector,_setting);
 }
 
 
-})(jQuery);
+class slider_dix{
+	constructor(_selector='',_setting={},_auto=true){
+		this.selector=_selector;
+		this.setting=_setting;
+		this.sliders=[];
+
+		if(_auto){
+			let t=this;
+			window.addEventListener('load', function(){
+				t.Start();
+			});
+		}
+		
+	}
+
+	setSelector(_selector=''){
+		if(_selector=='')return false;
+		this.selector=_selector;
+	}
+
+	Start(){
+		if(this.selector=='')return false;
+		let t=this;
+		document.querySelectorAll(this.selector).forEach(function(_slider){
+			t.sliders.push(new slider_dix_core(_slider,t.setting));
+		});	
+
+		return this.sliders;
+	}
+
+	Stop(){
+		alert('Stop slider');
+	}
+}
+
+class slider_dix_core{
+
+	constructor(_slider={},_setting={},_auto=true){
+		if (typeof _slider !== 'object')return false;
+		this.slider=_slider;
+		this.elements;
+		this.selector='';
+		this.setting={};
+		this.width=0;
+		this.max_width=0;
+		this.height=0;
+		this.ImgPos=0;
+		this.imgFirst={};
+		this.imgLast={};
+		this.animate_time=0;
+		this.animate_step=0;
+		this.width_elemen=0;
+		this.butNext;
+		this.butPrev;
+		this.AutoInterval;
+		this.locked=false;
+		this.time_pause=0;
+		this.page_active=true;
+
+	
+
+		if(_auto){
+			this.setSetting(_setting);
+			this.Start();
+		}
+
+	}
+
+	setSelector(_selector=''){
+		if(_selector=='')return false;
+		this.slider=document.querySelector(this.selector);
+		this.selector=_selector;
+	}
+
+	setSlider(_slider){
+		this.slider=_slider;
+	}
+
+	setSetting(_setting={}){
+		this.setting=_setting;
+		if(typeof this.setting.element === 'undefined')this.setting.element='img';
+		if(typeof this.setting.auto === 'undefined')this.setting.auto=3000;
+		if(typeof this.setting.auto_always === 'undefined')this.setting.auto_always=false;
+		if(typeof this.setting.look === 'undefined')this.setting.look=5000;
+		if(typeof this.setting.prev === 'undefined')this.setting.prev='';
+		if(typeof this.setting.next === 'undefined')this.setting.next='';
+		if(typeof this.setting.interval === 'undefined')this.setting.interval=1000;
+		if(typeof this.setting.step === 'undefined')this.setting.step=1;
+		if(typeof this.setting.auto_move === 'undefined')this.setting.auto_move='right';
+	}
+
+	Query(_selector=''){
+		if(_selector=='')return this.slider;
+		return this.slider.querySelector(_selector);
+	}
+
+	QueryList(_selector=''){
+		if(_selector=='')return this.slider;
+		return this.slider.querySelectorAll(_selector);
+	}
+
+	Start(){	
+		
+		this.Update();
+		this.AddButtons();
+		this.Auto();
+
+		this.Query().addEventListener('mousemove',()=>{
+			this.time_pause=this.Time()+this.setting.look;
+		});
+
+		document.addEventListener('visibilitychange', function() {
+			if (document.visibilityState === 'visible') {
+				this.page_active=true;
+			} else {
+				this.page_active=false;
+			}
+		});
+
+		window.addEventListener('resize',()=>{
+			this.Update();
+		});
+
+	}
+
+	Update(){
+		let t=this;
+		this.max_width=0;
+		this.ImgPos=0;
+		this.Query().style.position='relative';
+		this.Query().style.overflow='hidden';
+		this.width=this.Query().clientWidth;
+		this.height=this.Query().clientHeight;
+		this.elements=this.QueryList(this.setting.element);
+
+		this.elements.forEach(function(i){
+			i.style.position='absolute';
+			i.style.top ='0px';
+			i.style.left =t.ImgPos+'px';
+			t.ImgPos+=i.offsetWidth;
+			t.max_width+=i.offsetWidth;
+		});
+
+	}
+
+
+	
+
+	AddButtons(){
+
+		if(this.setting.next==''){
+			this.butNext = document.createElement('div');
+			this.butNext.className = 'sd-next';
+			this.Query().appendChild(this.butNext);
+		}else{
+			this.butNext=document.querySelector(this.setting.next);
+		}
+
+		if(this.setting.prev==''){
+			this.butPrev = document.createElement('div');
+			this.butPrev.className = 'sd-prev';
+			this.Query().appendChild(this.butPrev);
+		}else{
+			this.butPrev=document.querySelector(this.setting.prev);
+		}
+		
+
+		let t=this;
+		this.butNext.addEventListener('click', function() {
+			t.Move('right');
+		});
+
+		this.butPrev.addEventListener('click', function() {
+		   t.Move('left');
+		});
+	}
+
+
+
+	Move(_direction='right'){
+		
+		if(this.locked)return false;
+
+		this.locked=true;
+		let _speed=this.setting.step;
+		if(_direction=='left')_speed=-_speed;
+
+		this.Teleport(_direction);
+
+
+		
+		this.animate_step=this.width_elemen/this.setting.step;
+		this.animate_time=this.setting.interval/this.animate_step;
+
+
+		let t=this;
+		let i=0;
+		let anim = setInterval(function(){
+			t.QueryList(t.setting.element).forEach(function(e){
+				e.style.left=(parseFloat(e.style.left)+_speed)+'px';
+			});
+			i++;
+			if(i>=t.animate_step){
+				clearInterval(anim);
+				
+				t.locked=false;
+			}
+		},this.animate_time);
+	}
+
+	Teleport(_direction='right'){
+		
+		
+		let t=this;
+		let minLeft=0;
+		let maxLeft=0;
+		let maxLeftWidth=0;
+		let _left=0;
+		let _element_teleport='';
+		let _element_move='';
+		let _need=true;
+
+
+
+		this.QueryList(this.setting.element).forEach(function(e){
+			_left=parseFloat(e.style.left);
+			
+			if(minLeft>_left){
+				minLeft=_left;
+				if(_direction=='left'){
+					_element_teleport=e;
+				}
+				
+			}
+			if(maxLeft<_left){
+				maxLeft=_left;
+				maxLeftWidth=_left+e.offsetWidth;
+				if(_direction=='right'){
+					_element_teleport=e;
+				}
+				
+			}
+
+			if(_direction=='left' && _left<=t.width+5 &&  _left+e.offsetWidth>=t.width+5){
+				_element_move=e;
+			}
+			if(_direction=='right' && _left<=-5 &&  _left+e.offsetWidth>=-5){
+				_element_move=e;
+			}
+		});
+
+
+		if(_element_move=='')_element_move=_element_teleport;
+		this.width_elemen=_element_move.offsetWidth;
+
+
+
+		if(_element_teleport=='')return false;
+		if(_direction=='right'){
+			_element_teleport.style.left=minLeft-_element_teleport.offsetWidth+'px';
+		}else{
+			_element_teleport.style.left=maxLeftWidth+'px';
+		}
+
+
+		
+	}
+
+
+
+
+	Auto(){
+		if(this.setting.auto==0 || !this.page_active)return false;	
+
+		this.AutoInterval=setInterval(()=>{
+			if(this.width>this.max_width && this.setting.auto_always==false)return false;
+			if(this.Time()>this.time_pause){
+				this.Move(this.setting.auto_move);
+			}
+		},this.setting.auto);
+	}
+
+	Time(){
+		return new Date().getTime();
+	}
+
+	
+}
+
+
+

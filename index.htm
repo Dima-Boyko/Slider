@@ -4,23 +4,14 @@
 
 <head>
   <title></title>
-  <script language="JavaScript" type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
   <script language="JavaScript" type="text/javascript" src="slider_dix/slider_dix.js"></script>
   <link href="slider_dix/styles.css" rel="stylesheet"/>
-  <link href="css/styles.css" rel="stylesheet"/>
+	<meta name=viewport content="width=device-width, initial-scale=1">
 </head>
 
 <body>
 
-<div class="SliderDE">
-	<img src="image/1.jpg" />
-	<img src="image/2.jpg" />
-	<img src="image/3.jpg" />
-	<img src="image/4.jpg" />
-	<img src="image/5.jpg" />
-	<img src="image/6.jpg" />
-	<img src="image/7.jpg" />
-</div>
+
 
 <div class="slider-dix">
 	<img src="image/1.jpg" />
@@ -34,16 +25,6 @@
 
 
 
-<div class="SliderDO">
-	<img src="image/1.jpg" />
-	<img src="image/2.jpg" />
-	<img src="image/3.jpg" />
-	<img src="image/4.jpg" />
-	<img src="image/5.jpg" />
-	<img src="image/6.jpg" />
-	<img src="image/7.jpg" />
-</div>
-
 
 <div class="slider-text">
 	<p>text 1</p>
@@ -51,6 +32,7 @@
 	<p>text 3</p>
 	<p>text 4</p>
 </div>
+
 <div class="slider-dix2">
 	<div class="el"><img src="image/1.jpg" /></div> 
 	<div class="el"><img src="image/2.jpg" /></div> 
@@ -65,7 +47,7 @@
 	<div class="bp"></div>
 	<div class="bn"></div>
 	<div id="slider-image">
-		img src="image/1.jpg" />
+		<img src="image/1.jpg" />
 		<img src="image/2.jpg" />
 		<img src="image/3.jpg" />
 		<img src="image/4.jpg" />
@@ -75,13 +57,13 @@
 </div>
 
 
-<script language="JavaScript" type="text/javascript">
-	jQuery('.SliderDO').SliderDO() ;
-	jQuery('.slider-dix').SliderDIX() ;
-	jQuery('.slider-text').SliderDIX({'element':'p','interval':2000}) ;
-	jQuery('.slider-dix2').SliderDIX({'element':'.el','auto':0}) ;
-	jQuery('#slider-image').SliderDIX({'auto':2000,'prev':'#slider-image-wrap .bp','next':'#slider-image-wrap .bn'}) ;
-	jQuery('.SliderDE').SliderDExtinction({auto:10000,interval:1000,}) ;
+
+<script>
+	SliderDIX('.slider-dix');
+	SliderDIX('.slider-text',{'element':'p','interval':2000});
+	SliderDIX('.slider-dix2',{'element':'.el','auto':0});
+	SliderDIX('.slider-dix2',{'element':'.el','auto':0});
+	SliderDIX('#slider-image',{'auto':2000,'prev':'#slider-image-wrap .bp','next':'#slider-image-wrap .bn'}) ;
 </script>
 </body>
 
