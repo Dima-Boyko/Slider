@@ -29,3 +29,40 @@
   height: 42px;
   z-index: 100;
 }
+
+
+/* SliderDIX One */
+.SliderDO{
+  width: 200px;
+  height: 200px;
+  margin: auto;
+  margin-bottom: 20px;
+  position: relative;
+}
+.SliderDO img{
+  display: none;
+}
+.SliderDO .activ{
+  display: block;
+}
+
+.SliderDO #sdprev{
+  position: absolute;
+  top: 40%;
+  left: 10px;
+  cursor: pointer;
+  background-image: url(arrow-left.png);
+  width: 42px;
+  height: 42px;
+  z-index: 100;
+}
+.SliderDO #sdnext{
+  position: absolute;
+  top: 40%;
+  right: 10px;
+  cursor: pointer;
+  background-image: url(arrow-right.png);
+  width: 42px;
+  height: 42px;
+  z-index: 100;
+}

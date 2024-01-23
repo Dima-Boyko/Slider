@@ -66,7 +66,7 @@ sLook - пауза после ручного выбора (пропуск шагов)
 	}else{
 		but_prev=jQuery(slider_get['prev']);
 	}
-	
+
 	if(slider_get['prev']==undefined){
 		_Slider.append('<div id="sdnext"></div>');
 		but_next=_Slider.find(but_next);
@@ -234,4 +234,84 @@ sLook - пауза после ручного выбора (пропуск шагов)
 	  }
 
 	}
+//***********************************************************************************************************
+jQuery.fn.SliderDO = function (slider_get){
+    //******************************************************
+	//Параметры по умолчанию
+	var _slider_default=({
+	  'element':'img',
+	  'interval':500,
+	  'auto':2000,
+	  'look':5000
+	}) ;
+	if(slider_get==undefined)slider_get=_slider_default;
+	//******************************************************
+    //******************************************************
+	//                      НАСТРОЙКИ
+	var _Slider=jQuery(this);
+    var sElement=slider_get['element'];
+    var _length=0;
+    var interval=slider_get['interval'];     //анимация блоков
+	var auto_interval=slider_get['auto'];//пауза при авто прокрутке
+    var but_prev='#sdprev';
+	var but_next='#sdnext';
+    //******************************************************
+	//Добавить параметры по умолчанию
+	if(sElement==undefined)sElement=_slider_default['element'];
+	if(interval==undefined)interval=_slider_default['interval'];
+	if(auto_interval==undefined)auto_interval=_slider_default['auto'];
+	//if(Look==undefined)Look=_slider_default['look'];
+	//******************************************************
+    //******************************************************
+	//
+	_Slider.append('<div id="sdprev"></div>');
+    but_prev=_Slider.find(but_prev);
+	_Slider.append('<div id="sdnext"></div>');
+    but_next=_Slider.find(but_next);
+    //******************************************************
+    _Slider.find(sElement+':eq(0)').addClass('activ');
+    _Slider.find(sElement+':eq(0)').css('opacity',1);
+    _length=_Slider.find(sElement).length;
+    //******************************************************
+    //Кнопки выбора
+    but_prev.click(function(){
+      var _activ=_Slider.find('.activ');
+      //Анимацыя исчезновения
+      _activ.animate({opacity:0},interval).queue(function(){
+        _activ.removeClass('activ') ;
+        if(_activ.prev(sElement).length>0){ //показать следующий
+            _activ.prev().addClass('activ') ;
+
+        }else{ //блоки закончились показать первый
+          _Slider.find(sElement).last().addClass('activ');
+        }
+        //Покаать новый блок
+        _Slider.find('.activ').animate({opacity: 1},interval);
+        //завершение анимации
+        jQuery(this).dequeue();
+      });
+
+    })
+    but_next.click(function(){
+      var _activ=_Slider.find('.activ');
+      //Анимацыя исчезновения
+      _activ.animate({opacity:0},interval).queue(function(){
+        _activ.removeClass('activ') ;
+        if(_activ.next(sElement).length>0){ //показать следующий
+            _activ.next().addClass('activ') ;
+
+        }else{ //блоки закончились показать первый
+          _Slider.find(sElement).first().addClass('activ');
+        }
+        //Покаать новый блок
+        _Slider.find('.activ').animate({opacity: 1},interval);
+        //завершение анимации
+        jQuery(this).dequeue();
+      });
+
+    })
+
+}
+
+
 })(jQuery);
