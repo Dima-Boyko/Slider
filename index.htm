@@ -1,46 +1,61 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html lang="en">
 
 <head>
   <title></title>
   <script language="JavaScript" type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
   <script language="JavaScript" type="text/javascript" src="slider_dix/slider_dix.js"></script>
   <link href="slider_dix/styles.css" rel="stylesheet"/>
+  <link href="css/styles.css" rel="stylesheet"/>
 </head>
 
 <body>
-<div id="slider-1" class="slider">
-<div id="prev"></div>
-<div id="next"></div>
-  <div class="work">
-    <img src="image/1.jpg" />
-    <img src="image/2.jpg" />
-    <img src="image/3.jpg" />
-    <img src="image/4.jpg" />
-    <img src="image/5.jpg" />
-    <img src="image/6.jpg" />
-    <img src="image/7.jpg" />
-  </div>
+<div class="slider-dix">
+	<img src="image/1.jpg" />
+	<img src="image/2.jpg" />
+	<img src="image/3.jpg" />
+	<img src="image/4.jpg" />
+	<img src="image/5.jpg" />
+	<img src="image/6.jpg" />
+	<img src="image/7.jpg" />
 </div>
 
-<div id="slider-2" class="slider">
-<div id="prev"></div>
-<div id="next"></div>
-  <div class="work">
-    <img src="image/1.jpg" />
-    <img src="image/2.jpg" />
-    <img src="image/3.jpg" />
-    <img src="image/4.jpg" />
-    <img src="image/5.jpg" />
-    <img src="image/6.jpg" />
-    <img src="image/7.jpg" />
-  </div>
+<div class="slider-text">
+	<p>text 1</p>
+	<p>text 2</p>
+	<p>text 3</p>
+	<p>text 4</p>
 </div>
+<div class="slider-dix2">
+	<div class="el"><img src="image/1.jpg" /></div> 
+	<div class="el"><img src="image/2.jpg" /></div> 
+	<div class="el"><img src="image/3.jpg" /></div> 
+	<div class="el"><img src="image/4.jpg" /></div> 
+	<div class="el"><img src="image/5.jpg" /></div> 
+	<div class="el"><img src="image/6.jpg" /></div> 
+	<div class="el"><img src="image/7.jpg" /></div> 
+</div>
+
+<div id="slider-image-wrap">
+	<div class="bp"></div>
+	<div class="bn"></div>
+	<div id="slider-image">
+		img src="image/1.jpg" />
+		<img src="image/2.jpg" />
+		<img src="image/3.jpg" />
+		<img src="image/4.jpg" />
+		<img src="image/5.jpg" />
+		<img src="image/6.jpg" />
+	</div>
+</div>
+
+
 <script language="JavaScript" type="text/javascript">
-var slider=new SliderDIX('slider-1',5,220,800,1000,4000) ;
-var slider1=new SliderDIX('slider-2',5,220,1000,2500,5000) ;
+	jQuery('.slider-dix').SliderDIX() ;
+	jQuery('.slider-text').SliderDIX({'element':'p','interval':2000}) ;
+	jQuery('.slider-dix2').SliderDIX({'element':'.el','auto':0}) ;
+	jQuery('#slider-image').SliderDIX({'auto':2000,'prev':'#slider-image-wrap .bp','next':'#slider-image-wrap .bn'}) ;
 </script>
 </body>
 

@@ -1,44 +1,31 @@
-.slider{
-  background-image: url(bg.jpg);
+.slider-dix{
+  background: #000;
   position: relative;
-  width: 1200px;
+  width: 1000px;
   height: 220px;
-}
-.slider .work{
-  width: 100px;
-  height: 100%;
   overflow: hidden;
-  margin: auto;
-  position: relative;
-}
-.slider .list{
-  margin-top: 10px;
 }
 
-.slider img{
-  position: absolute;
-}
-.slider #prev{
-  position: absolute;
-  top: 40%;
-  left: 20px;
-  cursor: pointer;
-  background-image: url(arrow_video_left.gif);
-  width: 23px;
-  height: 44px;
-}
-.slider #next{
+
+
+
+.slider-dix #sdprev{
   position: absolute;
   top: 40%;
-  right: 20px;
+  left: 10px;
   cursor: pointer;
-  background-image: url(arrow_video_right.gif);
-  width: 23px;
-  height: 44px;
+  background-image: url(arrow-left.png);
+  width: 42px;
+  height: 42px;
+  z-index: 100;
 }
-.slider #prev:hover{
-  background-position: 0px 44px;
-}
-.slider #next:hover{
-  background-position: 0px 44px;
+.slider-dix #sdnext{
+  position: absolute;
+  top: 40%;
+  right: 10px;
+  cursor: pointer;
+  background-image: url(arrow-right.png);
+  width: 42px;
+  height: 42px;
+  z-index: 100;
 }
