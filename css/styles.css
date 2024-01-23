@@ -1,7 +1,7 @@
 #slider{
-  background-image: url(bg_bookshelf.png);
+  background-image: url(bg.jpg);
   position: relative;
-  width: 1012px;
+  width: 1200px;
   height: 220px;
 }
 #slider .work{
@@ -12,7 +12,7 @@
   position: relative;
 }
 #slider .list{
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 #slider img{
