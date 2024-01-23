@@ -1,0 +1,44 @@
+#slider{
+  background-image: url(bg_bookshelf.png);
+  position: relative;
+  width: 1012px;
+  height: 220px;
+}
+#slider .work{
+  width: 100px;
+  height: 100%;
+  overflow: hidden;
+  margin: auto;
+  position: relative;
+}
+#slider .list{
+  margin-top: 20px;
+}
+
+#slider img{
+  position: absolute;
+}
+#slider #prev{
+  position: absolute;
+  top: 40%;
+  left: 20px;
+  cursor: pointer;
+  background-image: url(arrow_video_left.gif);
+  width: 23px;
+  height: 44px;
+}
+#slider #next{
+  position: absolute;
+  top: 40%;
+  right: 20px;
+  cursor: pointer;
+  background-image: url(arrow_video_right.gif);
+  width: 23px;
+  height: 44px;
+}
+#slider #prev:hover{
+  background-position: 0px 44px;
+}
+#slider #next:hover{
+  background-position: 0px 44px;
+}
