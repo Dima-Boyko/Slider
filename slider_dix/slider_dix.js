@@ -1,7 +1,7 @@
 //******************************************************
 /*
  * Dmitry Boyko
- * 01.11.2016 v6
+ * 15.05.2018 v1.9
  *
  * 04.12.2013
  * 24.12.2013
@@ -10,8 +10,15 @@
 */
 //******************************************************
 /*
+Параметры сладеров
+element - css елемент в сладере
+interval - длительность анимации
+auto - пауза между анимациями / 0 - откоючить автоматическую анимацию
+look - пауза при ручном выборе
+adaptive - если передать yes то адаптация работает (по высоте внутрених блоков)
+prev и next - кноки для переключения
+//******************************************************
 Параметры функции
-
 sElement - блоки которые будут вращаться
 sCount - количество элементов в слайдере
 sMargin - ширина элемента
@@ -98,7 +105,16 @@ sLook - пауза после ручного выбора (пропуск шагов)
 	  
 	  //_Slider.find(work).css('width',width_ls+'px') ; 
 	  jQuery(this).find(sElement).css('position','absolute');
-
+	//Адаптивная высота
+	if(slider_get['adaptive']=='yes'){//вдватация не выключена
+		var _height_el=_Slider.find(sElement).height();
+		_Slider.height(_height_el);
+		jQuery(window).resize(function(){
+		  _height_el=_Slider.find(sElement).height();
+		  _Slider.height(_height_el);
+		});
+	}
+	
 	//******************************************************
 	//Прокрутка элементов в слайдере
 	time_pause=time+auto_interval; //ожидание прокрутки
@@ -256,26 +272,48 @@ jQuery.fn.SliderDO = function (slider_get){
 	var auto_interval=slider_get['auto'];//пауза при авто прокрутке
     var but_prev='#sdprev';
 	var but_next='#sdnext';
+	var loced=false;          //блокировать при анимации
     //******************************************************
 	//Добавить параметры по умолчанию
 	if(sElement==undefined)sElement=_slider_default['element'];
 	if(interval==undefined)interval=_slider_default['interval'];
 	if(auto_interval==undefined)auto_interval=_slider_default['auto'];
 	//if(Look==undefined)Look=_slider_default['look'];
+	
 	//******************************************************
+	//Адаптивная высота
+	if(slider_get['adaptive']=='yes'){//вдватация не выключена
+		var _height_el=_Slider.find(sElement).height();
+		_Slider.height(_height_el);
+		jQuery(window).resize(function(){
+		  _height_el=_Slider.find(sElement).height();
+		  _Slider.height(_height_el);
+		});
+	}
     //******************************************************
 	//
-	_Slider.append('<div id="sdprev"></div>');
-    but_prev=_Slider.find(but_prev);
-	_Slider.append('<div id="sdnext"></div>');
-    but_next=_Slider.find(but_next);
-    //******************************************************
+	if(slider_get['prev']==undefined){
+		_Slider.append('<div id="sdprev"></div>');
+		but_prev=_Slider.find(but_prev);
+	}else{
+		but_prev=jQuery(slider_get['prev']);
+	}
+
+	if(slider_get['prev']==undefined){
+		_Slider.append('<div id="sdnext"></div>');
+		but_next=_Slider.find(but_next);
+	}else{
+		but_next=jQuery(slider_get['next']);
+	}
+	//******************************************************
     _Slider.find(sElement+':eq(0)').addClass('activ');
     _Slider.find(sElement+':eq(0)').css('opacity',1);
     _length=_Slider.find(sElement).length;
     //******************************************************
     //Кнопки выбора
     but_prev.click(function(){
+	if(!loced){
+		loced=true;
       var _activ=_Slider.find('.activ');
       //Анимацыя исчезновения
       _activ.animate({opacity:0},interval).queue(function(){
@@ -288,12 +326,16 @@ jQuery.fn.SliderDO = function (slider_get){
         }
         //Покаать новый блок
         _Slider.find('.activ').animate({opacity: 1},interval);
+		loced=false;
         //завершение анимации
         jQuery(this).dequeue();
       });
+	}
 
     })
     but_next.click(function(){
+	if(!loced){
+		loced=true;
       var _activ=_Slider.find('.activ');
       //Анимацыя исчезновения
       _activ.animate({opacity:0},interval).queue(function(){
@@ -306,11 +348,40 @@ jQuery.fn.SliderDO = function (slider_get){
         }
         //Покаать новый блок
         _Slider.find('.activ').animate({opacity: 1},interval);
+		loced=false;
         //завершение анимации
         jQuery(this).dequeue();
       });
-
+	}
     })
+	
+	
+	if(auto_interval>0 && _Slider.find(sElement).length>2){
+	  
+		var timerId = setInterval(function(){
+		if(!loced){
+		loced=true;
+		var _activ=_Slider.find('.activ');
+      //Анимацыя исчезновения
+      _activ.animate({opacity:0},interval).queue(function(){
+        _activ.removeClass('activ') ;
+        if(_activ.next(sElement).length>0){ //показать следующий
+            _activ.next().addClass('activ') ;
+
+        }else{ //блоки закончились показать первый
+          _Slider.find(sElement).first().addClass('activ');
+        }
+        //Покаать новый блок
+        _Slider.find('.activ').animate({opacity: 1},interval);
+		loced=false;
+        //завершение анимации
+        jQuery(this).dequeue();
+      });
+	  
+		}
+		},auto_interval);
+
+	}
 
 }
 //***********************************************************************************************************
@@ -334,6 +405,7 @@ jQuery.fn.SliderDExtinction = function (slider_get){
 	var auto_interval=slider_get['auto'];//пауза при авто прокрутке
     var but_prev='#sdprev';
 	var but_next='#sdnext';
+	var loced=false;          //блокировать при анимации
     //******************************************************
 	//Добавить параметры по умолчанию
 	if(sElement==undefined)sElement=_slider_default['element'];
@@ -341,14 +413,31 @@ jQuery.fn.SliderDExtinction = function (slider_get){
 	if(auto_interval==undefined)auto_interval=_slider_default['auto'];
 	//if(Look==undefined)Look=_slider_default['look'];
 	//******************************************************
+	//Адаптивная высота
+	if(slider_get['adaptive']=='yes'){//вдватация не выключена
+		var _height_el=_Slider.find(sElement).height();
+		_Slider.height(_height_el);
+		jQuery(window).resize(function(){
+		  _height_el=_Slider.find(sElement).height();
+		  _Slider.height(_height_el);
+		});
+	}
     //******************************************************
 	//
-	
-	_Slider.append('<div id="sdprev"></div>');
-    but_prev=_Slider.find(but_prev);
-	_Slider.append('<div id="sdnext"></div>');
-    but_next=_Slider.find(but_next);
-    //******************************************************
+	if(slider_get['prev']==undefined){
+		_Slider.append('<div id="sdprev"></div>');
+		but_prev=_Slider.find(but_prev);
+	}else{
+		but_prev=jQuery(slider_get['prev']);
+	}
+
+	if(slider_get['prev']==undefined){
+		_Slider.append('<div id="sdnext"></div>');
+		but_next=_Slider.find(but_next);
+	}else{
+		but_next=jQuery(slider_get['next']);
+	}
+	//******************************************************
     _Slider.find(sElement+':eq(0)').addClass('activ');
     _Slider.find(sElement+':eq(0)').css('opacity',1);
 	
@@ -432,7 +521,7 @@ jQuery.fn.SliderDExtinction = function (slider_get){
 		
 		var _activ=_Slider.find('.activ');
 		if(_activ.next(sElement).length>0){ //показать следующий
-            _activ.next().addClass('next') ;
+            _activ.next(sElement).addClass('next') ;
 
         }else{ //блоки закончились показать первый
           _Slider.find(sElement).first().addClass('next');
