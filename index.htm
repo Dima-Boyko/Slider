@@ -11,7 +11,7 @@
 </head>
 
 <body>
-<div id="slider">
+<div id="slider-1" class="slider">
 <div id="prev"></div>
 <div id="next"></div>
   <div class="work">
@@ -26,6 +26,41 @@
   </div>
   </div>
 </div>
+
+<div id="slider" class="slider">
+<div id="prev"></div>
+<div id="next"></div>
+  <div class="work">
+  <div class="list">
+    <img src="image/1.jpg" />
+    <img src="image/2.jpg" />
+    <img src="image/3.jpg" />
+    <img src="image/4.jpg" />
+    <img src="image/5.jpg" />
+    <img src="image/6.jpg" />
+    <img src="image/7.jpg" />
+  </div>
+  </div>
+</div>
+
+<div id="slider2" class="slider">
+<div id="prev"></div>
+<div id="next"></div>
+  <div class="work">
+    <img src="image/1.jpg" />
+    <img src="image/2.jpg" />
+    <img src="image/3.jpg" />
+    <img src="image/4.jpg" />
+    <img src="image/5.jpg" />
+    <img src="image/6.jpg" />
+    <img src="image/7.jpg" />
+  </div>
+</div>
+<script language="JavaScript" type="text/javascript">
+var slider=new SliderDIX('slider-1',5,220,800,4,10) ;
+var slider2=new SliderDIX('slider',4,220,800,4,4) ;
+var slider3=new SliderDIX('slider2',5,220,1000,2,5) ;
+</script>
 </body>
 
 </html>
