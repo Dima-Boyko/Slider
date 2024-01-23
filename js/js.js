@@ -3,10 +3,15 @@ var margin=180;
 var step =margin;
 var loced=true;
 var interval=1000;
+var auto_interval=2000;
 var count=5;
 var element_count=0;
 var element_left=0;
-var auto_slider=0;
+var animate_cont="next";
+var pause_step=0;
+var pause_step=0;
+var pause=false;
+var slider_loked=false;
 $(document).ready(function(){
   $('img').each(function(i){
     $('img:eq('+i+')').css('left',i*margin) ;
@@ -14,14 +19,38 @@ $(document).ready(function(){
   element_count=$('img').length;
   width_ls=count* margin;
   $('#slider .work').css('width',width_ls+'px') ;
-  //$('img:last').css('left',-margin) ;
+  var auto_slider=setInterval(function(){
+    if(pause_step==0 && slider_loked==false)
+    {
+      controler(animate_cont);
+    }
+    else
+    {
+      pause_step--;
+      pause=false;
+      if(pause_step<0)pause_step=0;
+    }
+    if(pause==true)pause_step=3;
+    if(animate_cont=="prev")animate_cont="next";
+  },auto_interval);
+  //
+  $(window).bind('blur', function() {
+    slider_loked=true;
+  });
+  $(window).bind('focus', function() {
+    slider_loked=false;
+  });
 });
 $(function(){
   $('#next').click(function(){
-    if(loced==true)controler('prev');
+    animate_cont='prev';
+    pause_step=0;
+    pause=true;
   });
   $('#prev').click(function(){
-    if(loced==true)controler('next');
+    animate_cont='next';
+    pause_step=0;
+    pause=true;
   });
 });
 
